@@ -124,3 +124,9 @@
 3. babel-runtime 和 babel-polyfill的区别
 
 ## Vue原理
+
+### 1.如何理解MVVM?
+
+注：画一张图
+
+### 2.vue响应式原理
