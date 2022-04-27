@@ -130,3 +130,23 @@
 注：画一张图
 
 ### 2.vue响应式原理
+
++ `Object.defineProperty`
++ `Vue.observable`
++ `发布订阅模式`
+
+### 3.Virtual DOM
+
++ 用js模拟DOM结构
+
+  + tag/sel：标签或选择器(css)
+  + props/data：事件/样式属性等
+  + children：子元素
+
++ 新旧vnode对比，计算出最小的更新范围，更新DOM（diff算法）
+
+```javascript
+  
+```
+
+### 4.Diff算法
