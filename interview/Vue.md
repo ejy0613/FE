@@ -141,7 +141,7 @@
 
   + tag/sel：标签或选择器(css)
   + props/data：事件/样式属性等
-  + children：子元素（数组or字符串，也可以只代表数组，额外定义 text 表示字符串）
+  + children：子元素（数组/字符串，也可以只代表数组，额外定义 text 表示字符串）
 
 + 新旧vnode对比，计算出最小的更新范围，更新DOM（diff算法）
 
