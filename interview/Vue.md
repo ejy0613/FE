@@ -141,12 +141,46 @@
 
   + tag/sel：标签或选择器(css)
   + props/data：事件/样式属性等
-  + children：子元素
+  + children：子元素（数组or字符串，也可以只代表数组，额外定义 text 表示字符串）
 
 + 新旧vnode对比，计算出最小的更新范围，更新DOM（diff算法）
 
+```html
+  <div id="div1" class="container">
+    <p>vdom</p>
+    <ul style="font-size: 20px;">
+      <li>a</li>
+    </ul>
+  </div>
+  ```
+
 ```javascript
-  
+  // vnode结构
+  {
+    tag: 'div',
+    props: {
+      className: 'container',
+      id: 'div1'
+    },
+    children: [
+      {
+        tag: 'p',
+        children: 'vdom'
+      },
+      {
+        tag: 'ul',
+        props: {
+          style: 'font-size: 20px;'
+        },
+        children: [
+          {
+            tag: 'li',
+            children: 'a'
+          }
+        ]
+      }
+    ]
+  }
 ```
 
 ### 4.Diff算法
