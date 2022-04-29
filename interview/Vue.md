@@ -1,6 +1,7 @@
 # Vue
 
-> vue相关知识复习，仅进行记录总结，形式（笔记 + 代码 + xmind）
+> vue相关知识复习，仅进行记录总结，形式（笔记 + 代码 + xmind）  
+> 其他参考：<https://vue3js.cn/interview/>
 
 ## Vue使用
 
@@ -183,4 +184,144 @@
   }
 ```
 
-### 4.Diff算法
+### 4.Diff算法（以snabbdom为例）
+
++ diff算法概述
+  + diff即对比，比如linux diff, github diff
+  + 两个对象可以做diff，如：<https://github.com/cujojs/jiff>
+  + 两棵树可以做diff，如：vdom diff
+
++ 树diff的时间复杂度是 o(n^3) => 3个循环组合，因此是 o(n^3)  => 不可用
+  + 1. 遍历tree1
+  + 2. 遍历tree2
+  + 3. 排序
++ 时间复杂度优化到 o(n)
+  + 只比较同一层级，不做跨级比较
+  + tag/sel不相同，则直接删掉重建，不再做深度比较
+  + tag/sel和key，两者都相同，则认为是相同节点，不再深度比较
+
+#### 生成vnode
+
++ h函数主逻辑：生成vnode，返回vnode对象
+
++ h函数参数
+
++ h函数代码片段
+
+```typescript
+  export function h(sel: string): VNode;
+  export function h(sel: string, data: VNodeData | null): VNode;
+  export function h(sel: string, children: VNodeChildren): VNode;
+  export function h(
+    sel: string,
+    data: VNodeData | null,
+    children: VNodeChildren
+  ): VNode;
+  export function h(sel: any, b?: any, c?: any): VNode {
+    let data: VNodeData = {};
+    let children: any;
+    let text: any;
+    let i: number;
+    if (c !== undefined) {
+      if (b !== null) {
+        data = b;
+      }
+      if (is.array(c)) {
+        children = c;
+      } else if (is.primitive(c)) {
+        text = c.toString();
+      } else if (c && c.sel) {
+        children = [c];
+      }
+    } else if (b !== undefined && b !== null) {
+      if (is.array(b)) {
+        children = b;
+      } else if (is.primitive(b)) {
+        text = b.toString();
+      } else if (b && b.sel) {
+        children = [b];
+      } else {
+        data = b;
+      }
+    }
+    if (children !== undefined) {
+      for (i = 0; i < children.length; ++i) {
+        if (is.primitive(children[i]))
+          children[i] = vnode(
+            undefined,
+            undefined,
+            undefined,
+            children[i],
+            undefined
+          );
+      }
+    }
+    if (
+      sel[0] === "s" &&
+      sel[1] === "v" &&
+      sel[2] === "g" &&
+      (sel.length === 3 || sel[3] === "." || sel[3] === "#")
+    ) {
+      addNS(data, children, sel);
+    }
+    return vnode(sel, data, children, text, undefined);
+  }
+```
+  
++ 参考源码：<https://github.com/snabbdom/snabbdom/blob/master/src/h.ts>
+
+#### patch函数
+
++ patch函数主逻辑：判断vnode的tag/sel 以及 key是否相等
+
++ patch函数参数
+  + patch(container, vnode)
+  + patch(vnode, newVnode)
+  + patch(vnode, null)
+
++ patch函数代码片段
+
+```typescript
+  return function patch(
+    oldVnode: VNode | Element | DocumentFragment,
+    vnode: VNode
+  ): VNode {
+    let i: number, elm: Node, parent: Node;
+    const insertedVnodeQueue: VNodeQueue = [];
+    // 执行pre hooks
+    for (i = 0; i < cbs.pre.length; ++i) cbs.pre[i]();
+
+    if (isElement(api, oldVnode)) {
+      // 如果vnode是元素节点（ps: Node.nodeType === 1, 元素节点）
+      oldVnode = emptyNodeAt(oldVnode);
+    } else if (isDocumentFragment(api, oldVnode)) {
+      // 如果vnode是文档片段（ps: DocumentFragment，文档接口片段，一个没有父对象的最小文档对象）
+      oldVnode = emptyDocumentFragmentAt(oldVnode);
+    }
+
+    // 相同的vnode（key 和 sel/tag 都相等）
+    if (sameVnode(oldVnode, vnode)) {
+      // vnode 对比
+      patchVnode(oldVnode, vnode, insertedVnodeQueue);
+    } else {
+      // 不同的vnode, 直接删除重建（ps: ! 非空断言操作符，用于排除 null/undefined ，即告诉编译器：xx变量肯定不是null或undefined）
+      elm = oldVnode.elm!;
+      parent = api.parentNode(elm) as Node;
+
+      createElm(vnode, insertedVnodeQueue);
+
+      if (parent !== null) {
+        api.insertBefore(parent, vnode.elm!, api.nextSibling(elm));
+        removeVnodes(parent, [oldVnode], 0, 0);
+      }
+    }
+
+    for (i = 0; i < insertedVnodeQueue.length; ++i) {
+      insertedVnodeQueue[i].data!.hook!.insert!(insertedVnodeQueue[i]);
+    }
+    for (i = 0; i < cbs.post.length; ++i) cbs.post[i]();
+    return vnode;
+  };
+```
+
++ 参考源码：<https://github.com/snabbdom/snabbdom/blob/master/src/init.ts>
