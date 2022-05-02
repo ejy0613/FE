@@ -325,3 +325,198 @@
 ```
 
 + 参考源码：<https://github.com/snabbdom/snabbdom/blob/master/src/init.ts>
+
+#### patchVnode函数
+
++ patchVnode函数逻辑：比较vnode
++ patchVnode函数参数：
++ patchVnode函数代码片段
+
+```typescript
+  function patchVnode(
+    oldVnode: VNode,
+    vnode: VNode,
+    insertedVnodeQueue: VNodeQueue
+  ) {
+    const hook = vnode.data?.hook;
+    // 执行prepatch hook
+    hook?.prepatch?.(oldVnode, vnode);
+    // 设置 vnode.elm
+    const elm = (vnode.elm = oldVnode.elm)!;
+    // 旧 children
+    const oldCh = oldVnode.children as VNode[];
+    // 新 children
+    const ch = vnode.children as VNode[];
+    if (oldVnode === vnode) return;
+    // hook相关
+    if (
+      vnode.data !== undefined ||
+      (isDef(vnode.text) && vnode.text !== oldVnode.text)
+    ) {
+      vnode.data ??= {};
+      oldVnode.data ??= {};
+      for (let i = 0; i < cbs.update.length; ++i)
+        cbs.update[i](oldVnode, vnode);
+      vnode.data?.hook?.update?.(oldVnode, vnode);
+    }
+    // vnode.text === undefined (vnode.children !== undefined vnode.children 一般有值)
+    if (isUndef(vnode.text)) {
+      // 新旧都有 children
+      if (isDef(oldCh) && isDef(ch)) {
+        if (oldCh !== ch) updateChildren(elm, oldCh, ch, insertedVnodeQueue);
+        // 新children有  旧children无（旧text有）
+      } else if (isDef(ch)) {
+        // 清空text
+        if (isDef(oldVnode.text)) api.setTextContent(elm, "");
+        // 添加children
+        addVnodes(elm, null, ch, 0, ch.length - 1, insertedVnodeQueue);
+        // 旧children有，新children无
+      } else if (isDef(oldCh)) {
+        // 移除children
+        removeVnodes(elm, oldCh, 0, oldCh.length - 1);
+        // 旧text有
+      } else if (isDef(oldVnode.text)) {
+        // 清空text
+        api.setTextContent(elm, "");
+      }
+      // else vnode.text !== undefined (vnode.children 无值)
+    } else if (oldVnode.text !== vnode.text) {
+      // 移除旧 children
+      if (isDef(oldCh)) {
+        removeVnodes(elm, oldCh, 0, oldCh.length - 1);
+      }
+      // 设置新的 text
+      api.setTextContent(elm, vnode.text!);
+    }
+    hook?.postpatch?.(oldVnode, vnode);
+  }
+
+```
+
++ 参考源码：<https://github.com/snabbdom/snabbdom/blob/master/src/init.ts>
+
+#### updateChildren函数
+
++ updateChildren函数逻辑：更新children
+  从四个索引位置（oldStartIdx, newStartIdx, oldEndIdx, newEndIdx）开始进行对比，看是否命中
++ updateChildren函数参数：
++ updateChildren函数代码片段：
+
+```typescript
+  function updateChildren(
+    parentElm: Node,
+    oldCh: VNode[],
+    newCh: VNode[],
+    insertedVnodeQueue: VNodeQueue
+  ) {
+    let oldStartIdx = 0;
+    let newStartIdx = 0;
+    let oldEndIdx = oldCh.length - 1;
+    let oldStartVnode = oldCh[0];
+    let oldEndVnode = oldCh[oldEndIdx];
+    let newEndIdx = newCh.length - 1;
+    let newStartVnode = newCh[0];
+    let newEndVnode = newCh[newEndIdx];
+    let oldKeyToIdx: KeyToIndexMap | undefined;
+    let idxInOld: number;
+    let elmToMove: VNode;
+    let before: any;
+
+    while (oldStartIdx <= oldEndIdx && newStartIdx <= newEndIdx) {
+      if (oldStartVnode == null) {
+        oldStartVnode = oldCh[++oldStartIdx]; // Vnode might have been moved left
+      } else if (oldEndVnode == null) {
+        oldEndVnode = oldCh[--oldEndIdx];
+      } else if (newStartVnode == null) {
+        newStartVnode = newCh[++newStartIdx];
+      } else if (newEndVnode == null) {
+        newEndVnode = newCh[--newEndIdx];
+        // 开始和开始对比
+      } else if (sameVnode(oldStartVnode, newStartVnode)) {
+        patchVnode(oldStartVnode, newStartVnode, insertedVnodeQueue);
+        oldStartVnode = oldCh[++oldStartIdx];
+        newStartVnode = newCh[++newStartIdx];
+
+        // 结束和结束对比
+      } else if (sameVnode(oldEndVnode, newEndVnode)) {
+        patchVnode(oldEndVnode, newEndVnode, insertedVnodeQueue);
+        oldEndVnode = oldCh[--oldEndIdx];
+        newEndVnode = newCh[--newEndIdx];
+
+        // 开始和结束对比
+      } else if (sameVnode(oldStartVnode, newEndVnode)) {
+        // Vnode moved right
+        patchVnode(oldStartVnode, newEndVnode, insertedVnodeQueue);
+        api.insertBefore(
+          parentElm,
+          oldStartVnode.elm!,
+          api.nextSibling(oldEndVnode.elm!)
+        );
+        oldStartVnode = oldCh[++oldStartIdx];
+        newEndVnode = newCh[--newEndIdx];
+
+        // 结束和开始对比
+      } else if (sameVnode(oldEndVnode, newStartVnode)) {
+        // Vnode moved left
+        patchVnode(oldEndVnode, newStartVnode, insertedVnodeQueue);
+        api.insertBefore(parentElm, oldEndVnode.elm!, oldStartVnode.elm!);
+        oldEndVnode = oldCh[--oldEndIdx];
+        newStartVnode = newCh[++newStartIdx];
+
+        // 都未命中
+      } else {
+        if (oldKeyToIdx === undefined) {
+          oldKeyToIdx = createKeyToOldIdx(oldCh, oldStartIdx, oldEndIdx);
+        }
+        // 拿新节点的key， 能否对应上 oldch 中的某个节点的key
+        idxInOld = oldKeyToIdx[newStartVnode.key as string];
+
+        // (key) 没对应上其他节点
+        if (isUndef(idxInOld)) {
+          // New element
+          api.insertBefore(
+            parentElm,
+            createElm(newStartVnode, insertedVnodeQueue),
+            oldStartVnode.elm!
+          );
+
+        // (key) 对应上了其他节点 
+        } else {
+          elmToMove = oldCh[idxInOld];
+          // sel是否相等（sameVnode的条件）
+          if (elmToMove.sel !== newStartVnode.sel) {
+            api.insertBefore(
+              parentElm,
+              createElm(newStartVnode, insertedVnodeQueue),
+              oldStartVnode.elm!
+            );
+
+          // sel相等，key相等
+          } else {
+            patchVnode(elmToMove, newStartVnode, insertedVnodeQueue);
+            oldCh[idxInOld] = undefined as any;
+            api.insertBefore(parentElm, elmToMove.elm!, oldStartVnode.elm!);
+          }
+        }
+        // 指针累加
+        newStartVnode = newCh[++newStartIdx];
+      }
+    }
+
+    if (newStartIdx <= newEndIdx) {
+      before = newCh[newEndIdx + 1] == null ? null : newCh[newEndIdx + 1].elm;
+      addVnodes(
+        parentElm,
+        before,
+        newCh,
+        newStartIdx,
+        newEndIdx,
+        insertedVnodeQueue
+      );
+    }
+    if (oldStartIdx <= oldEndIdx) {
+      removeVnodes(parentElm, oldCh, oldStartIdx, oldEndIdx);
+    }
+  }
+
+```
