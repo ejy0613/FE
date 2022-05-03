@@ -135,6 +135,7 @@
 + `Object.defineProperty`
 + `Vue.observable`
 + `发布订阅模式`
++ Demo：`observe-demo`
 
 ### 3.Virtual DOM
 
@@ -145,6 +146,7 @@
   + children：子元素（数组/字符串，也可以只代表数组，额外定义 text 表示字符串）
 
 + 新旧vnode对比，计算出最小的更新范围，更新DOM（diff算法）
++ Demo：`vdom-demo`
 
 ```html
   <div id="div1" class="container">
@@ -520,3 +522,75 @@
   }
 
 ```
+
+### 5.模版编译
+
+#### 前置知识：JS的`with`语法
+
++ 改变 {} 内自由变量的查找规则，当作 obj 的属性来查找；
++ 如果找不到匹配的 obj 属性，就会报错
++ with 要慎用，因为打破了作用域规则，易读性变差
+
+```javascript
+  const obj = { a: 100, b: 200 };
+  console.log(obj.a) // 100
+  console.log(obj.b) // 200
+  console.log(obj.c) // undefined
+
+  // with语法
+  with(obj) {
+    console.log(a) // 100
+    console.log(b) // 200
+    console.log(c) // 报错 error
+  }
+```
+
+#### vue template complier
+
++ 将模版转换为`render`函数，执行`render`函数生成vnode
++ 使用 `webpack vue-loader` 会在开发环境下编译模版
++ 可以使用 `h`函数 替代 `createElement`
++ Demo：`vue-template-compiler-demo`
+
+```javascript
+  // use render createElement
+  Vue.component('heading', {
+    // tempalte: `...`
+    render: function(createElement) {
+      return createElement(
+        'h' + this.level,
+        [
+          createElement('a', {
+            attrs: {
+              name: 'headerId',
+              href: '#' + 'headerId'
+            }
+          },
+          'this is a tag'
+          )
+        ]
+      )
+    }
+  })
+
+  // use render h func
+  Vue.component('heading', {
+    render() {
+      return h(
+        'h' + this.level,
+        [
+          createElement('a', {
+            attrs: {
+              name: 'headerId',
+              href: '#' + 'headerId'
+            }
+          },
+          'this is a tag'
+          )
+        ]
+      )
+    }
+  })
+```
+
+### 6.组件渲染/更新过程
