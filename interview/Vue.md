@@ -594,3 +594,31 @@
 ```
 
 ### 6.组件渲染/更新过程
+
+#### 初次渲染过程
+
+#### 更新过程
+
+#### 异步渲染
+
+### 7.前端路由
+
+#### url组成部分
+
+```javascript
+  // url: http://127.0.0.1:8881/hash.html?a=100#/aaa/bbb
+  location.protocol // 'http:'
+  location.hostname // '127.0.0.1'
+  location.host     // '127.0.0.1:8881'
+  location.pathname // 'hash.html'
+  location.search   // '?a=100'
+  location.hash     // '#/aaa/bbb'
+```
+
+#### hash
+
+JS实现 Hash 路由：`code/router-demo/hash.html`
+
+#### H5 history
+
+JS实现 H5 history 路由： `code/router-demo/history.htm`
