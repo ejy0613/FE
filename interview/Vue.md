@@ -1,7 +1,7 @@
 # Vue
 
 > vue相关知识复习，仅进行记录总结，形式（笔记 + 代码 + xmind）  
-> 其他参考：<https://vue3js.cn/interview/>
+> **其他参考：<https://vue3js.cn/interview/>**
 
 ## Vue使用
 
@@ -101,21 +101,12 @@
 
   ```
 
-## Vue面试题
-
 ### vue使用相关
 
 1. v-show和v-if的区别
 2. 为何v-for要使用key
 3. 描述Vue组件生命周期（有父子组件的情况）
 4. Vue组件如何通信
-
-### vue原理相关
-
-1. 描述组件渲染和更新的过程（原理）
-2. 双向数据绑定 v-model 的实现原理（原理）
-
-## Vue3
 
 ## webpack
 
@@ -622,3 +613,109 @@ JS实现 Hash 路由：`code/router-demo/hash.html`
 #### H5 history
 
 JS实现 H5 history 路由： `code/router-demo/history.htm`
+
+## Vue面试题
+
++ **1.v-show 和 v-if 的区别**
+  + v-show 通过 css display 控制显示和隐藏（有更高的初始渲染消耗）
+  + v-if 是组件真正的渲染和销毁，而并不是显示和隐藏（有更高的切换消耗）
+  + 频繁切换显示使用 v-show，否则使用 v-if
+  
++ **2.为何在v-for中使用key**
+  > vue默认采用就地复用原则。
+  + 建议用key，且不要用index 或 random
+  + diff算法中通过tag和key来判断，是否是sameNode(同一节点)（path -> sameNode() && updateChildren()）
+  + 可以减少渲染次数，提高渲染性能
+
++ **3.描述vue组件生命周期（父子组件）**
+  + 单组件生命周期图（beforeCreate, created, beforeMount, mounted, beforeUpdate, updated, beforeDestory, destoryed）
+  + 父子组件生命周期关系（创建：父组件 -> 子组件；渲染：子组件 -> 父组件）
+
++ **4.vue组件通信**
+  + 父子组件 props 和 this.$emit
+  + 自定义事件 event.$on event.$off event.$emit
+  + vuex
+  + provide/inject
+  + ...
+
++ **5.描述组件渲染和更新的过程**
+  > 图示链接：<https://cn.vuejs.org/v2/guide/reactivity.html>
+  + 解析模版为render函数
+  + 触发响应式，监听 data 属性 getter setter
+  + 执行render函数，生成vnode
+
++ **6.双向数据绑定v-model的原理**
+  + input元素的value = this.name
+  + 绑定input事件 this.name = $event.target.value
+  + data 更新触发 re-render
+
++ **7.对MVVM的理解**
+
++ **8.computed有何特点**
+  + 惰性的，具有缓存，data不变不会重新计算
+  + 提高性能
+
++ **9.为什么组件data是一个函数**
+  + .vue文件编译后是一个类，每个地方使用这个组件的时候相当于是这个类的实例化，data是一个函数保证处于当前的闭包当中，不会出现污染
+  + 其他参考：<https://vue3js.cn/interview/vue/data.html#%E4%B8%89%E3%80%81%E5%8E%9F%E7%90%86%E5%88%86%E6%9E%90>
+
++ **10.ajax请求应该放在哪个生命周期**
+  + mounted
+  + JS是单线程的，ajax异步获取数据
+  + 放在mounted之前没有什么用，只会让逻辑混乱
+
++ **11.如何将组件所有的props传递给自组件**
+
+  ```javascript
+    // 使用 $props
+    <User v-bind="$props" />
+  ```
+
++ **12.如何实现v-model**
+
+  ```javascript
+    <CustomizeModel v-model="name">
+    
+    // CustomizeModel.vue
+    <template>
+      <input type="text" value="text" @input="$emit('change', $event.target.value)" />
+    </template>
+
+    <script>
+      export default {
+        model: {
+          props: 'text',
+          event: 'change'
+        },
+        props: {
+          text: {
+            type: String,
+            default: ''
+          }
+        }
+      }
+    </script>
+  ```
+
++ **13.多个组件有相同的逻辑，如何抽离**
+  + mixin
+  + mixin的缺点
+    + 变量来源不明确，不利于阅读
+    + 多mixin可能会造成命名冲突
+    + mixin和组件可能存在多对多的关系，复杂度较高
+
++ **14.何时要使用异步组件**
+  + 加载大组件
+  + 路由异步加载
+  + 可以优化性能
+
++ **15.何时使用keep-alive**
+  + 缓存组件，不需要重复渲染
+  + 多个静态tab页的切换
+  + 可以优化性能
+
+### 4.何时需要使用beforeDestory
+
+### 5.diff算法时间复杂度
+
+### 6.vue常见性能优化
