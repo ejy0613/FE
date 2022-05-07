@@ -714,8 +714,90 @@ JS实现 H5 history 路由： `code/router-demo/history.htm`
   + 多个静态tab页的切换
   + 可以优化性能
 
-### 4.何时需要使用beforeDestory
++ **16.何时需要使用beforeDestory**
+  + 解除自定义事件 event.$off
+  + 清除定时器
+  + 解绑自定义的DOM事件，如window, scroll等
 
-### 5.diff算法时间复杂度
++ **17.vuex中action 和 mutation有何区别**
+  + action中处理异步，mutation处理同步
+  + mutation做原子操作
+  + action可以整合多个mutation
 
-### 6.vue常见性能优化
++ **18.用vnode描述一个DOM结构**
+
+  ```html
+  <div id="div1" class="container">
+    <p>vdom</p>
+    <ul style="font-size: 20px;">
+      <li>a</li>
+    </ul>
+  </div>
+  ```
+
+```javascript
+  // vnode结构
+  {
+    tag: 'div', // or sel
+    props: { // or data
+      className: 'container', // or staticClass
+      id: 'div1'
+    },
+    children: [
+      {
+        tag: 'p',
+        children: 'vdom'
+      },
+      {
+        tag: 'ul',
+        props: {
+          style: 'font-size: 20px;'
+        },
+        children: [
+          {
+            tag: 'li',
+            children: 'a'
+          }
+        ]
+      }
+    ]
+  }
+  ```
+
++ **19.Vue如何监听数组变化**
+  + `Object.defineProperty` 不能监听数组变化
+  + 重新定义原型，重写push pop等方法，实现监听
+  + Proxy 可以原生支持监听数组变化
+
++ **20.描述响应式原理**
+  + 监听data变化
+  + 组件渲染和更新的流程
+
++ **21.diff算法时间复杂度**
+  + O(n)
+  + 在O(n^3) 基础上做了调整
+    + 只比较同一层级（组件），不做跨级比较
+    + tag/sel不相同，则直接删掉重建，不再做深度比较
+    + tag/sel和key，两者都相同，则认为是相同节点，不再深度比较
+
++ **22.简述diff算法过程**
+  + 从vdom的使用开始，首先要明白vnode的结构，patch(elem, vnode) 和 patch(vnode, newVnode)
+  + patchVnode 和 addVnodes 和 removeVnodes
+  + updateChildren(key的重要性)
+
++ **23.vue为何是异步渲染，$nextTick有何用**
+  + 异步渲染（以及合并data修改），以提高渲染性能
+  + $nextTick在DOM更新完之后，触发回调
+
++ **24.vue常见性能优化**
+  + 合理使用v-show 和 v-if
+  + 合理使用compupted
+  + v-for时加key，以及避免和v-if同时使用
+  + 自定义事件，DOM事件要及时销毁
+  + 合理使用异步组件
+  + 合理使用keep-alive
+  + data层级不要太深
+  + 使用vue-loader 在开发环境做模版编译（预编译）
+  + webpack层面优化
+  + 前端通用的性能优化，如图片懒加载
+  + 使用SSR
