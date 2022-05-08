@@ -801,3 +801,29 @@ JS实现 H5 history 路由： `code/router-demo/history.htm`
   + webpack层面优化
   + 前端通用的性能优化，如图片懒加载
   + 使用SSR
+
+## Vue3
+
+### 1.Vue3 比 Vue2有什么优势？
+
+### 2.描述Vue3生命周期
+
+### 3.如何看待Composition API 和 Options API
+
+### 4.如何理解 ref toRef toRefs？
+
+### 5.Vue3升级了哪些重要功能？
+
+### 6.Composition API 如何实现代码复用
+
+#### 7.Vue3如何实现响应式？
+
+### 8.watch 和 watchEffect 的区别？
+
+### 9.setup中如何获取组件实例（实际考this）？
+
+### 10.Vue3 为何比 Vue2快？
+
+### 11.Vite是什么
+
+### 12.Composition API 和 React Hooks对比？
