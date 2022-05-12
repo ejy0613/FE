@@ -806,9 +806,37 @@ JS实现 H5 history 路由： `code/router-demo/history.htm`
 
 ### 1.Vue3 比 Vue2有什么优势？
 
++ **性能更好**
++ 体积更小
++ **更好的TS支持**
++ **更好的代码组织**
++ **更好的逻辑抽离**
++ 更多新功能
+
 ### 2.描述Vue3生命周期
 
+#### Options API生命周期
+
++ beforeDestory -> beforeUnmount
++ destoryed -> unmounted
+
+#### Composition API生命周期
+
++ 使用方式不同，需要引入生命周期钩子函数
++ 函数名称前 + `on`
+
+```javascript
+  setup() {
+    import { onBeforeMount, onMounted, onBeforeUpdate, onUpdated, onBeforeUnmount, onUnmounted } from 'vue'
+  }
+```
+
 ### 3.如何看待Composition API 和 Options API
+
++ Compsition API带来了什么？
+  + 更好的代码组织
+  + 更好的逻辑复用
++ Compostion API 和 Options API如何选择？
 
 ### 4.如何理解 ref toRef toRefs？
 
