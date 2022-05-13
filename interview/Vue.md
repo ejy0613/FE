@@ -836,9 +836,35 @@ JS实现 H5 history 路由： `code/router-demo/history.htm`
 + Compsition API带来了什么？
   + 更好的代码组织
   + 更好的逻辑复用
+  + 更好的类型推导
+
 + Compostion API 和 Options API如何选择？
+  + 不建议共用，会引起混乱
+  + 小型项目、业务逻辑简单，用Options API
+  + 中大型项目、业务逻辑复杂，用Composition API
 
 ### 4.如何理解 ref toRef toRefs？
+
+#### ref
+
++ 用来生成值类型的响应式数据
++ 可用于模版和reactive
++ 通过 `.value` 修改值
++ 可以获取DOM节点，节点使用ref绑定， `const elmentRef = ref(null)`
+
+#### toRef
+
++ 针对一个响应式对象（reactive封装）的prop
++ 创建一个ref，具有响应式
++ 两者保持引用关系
++ 如果用于普通对象，产出的结果不具备响应式
+
+#### roRefs
+
++ 将响应式对象转换为普通对象
++ 对象的每个prop都是对应的ref
++ 两者保持引用关系
++ 合成函数返回响应式对象
 
 ### 5.Vue3升级了哪些重要功能？
 
