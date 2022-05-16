@@ -850,7 +850,15 @@ JS实现 H5 history 路由： `code/router-demo/history.htm`
 + 用来生成值类型的响应式数据
 + 可用于模版和reactive
 + 通过 `.value` 修改值
-+ 可以获取DOM节点，节点使用ref绑定， `const elmentRef = ref(null)`
++ 可以获取DOM节点，节点使用ref绑定， `const elmentRef = ref(null)`  
+  **为何使用ref？**  
+  + 返回值类型，会丢失响应式（如在setup/computed/合成函数，都有可能返回值类型）；  
+  + vue如果不定义ref，用户将自造ref，反而混乱
+
+  **为何ref需要value属性？**  
+
+  + ref是一个对象（不丢失响应式），value存储值
+  + 通过 .value 属性的get和set实现响应式
 
 #### toRef
 
@@ -866,7 +874,23 @@ JS实现 H5 history 路由： `code/router-demo/history.htm`
 + 两者保持引用关系
 + 合成函数返回响应式对象
 
+  **为什么需要toRef/toRefs？**
+  + 不丢失响应式的情况下，把对象数据 -> 解构/扩散
+  + 不创造响应式，而是延续响应式
+
 ### 5.Vue3升级了哪些重要功能？
+
++ createApp
++ emits属性
++ 生命周期
++ 多事件
++ Fragment
++ 移除 .sync -> v-bind:name.sync = v-model:name
++ 异步组件的写法 -> defineAsyncComponent
++ 移除 filter -> 不利于类型推导、类型检测等
++ Teleport
++ Suspense
++ Composition API
 
 ### 6.Composition API 如何实现代码复用
 
