@@ -894,7 +894,52 @@ JS实现 H5 history 路由： `code/router-demo/history.htm`
 
 ### 6.Composition API 如何实现代码复用
 
-#### 7.Vue3如何实现响应式？
++ 抽离逻辑代码到一个函数
++ 函数命名约定为 useXxx 格式（React Hooks也是）
++ 在setup中引入 useXxx 函数
+
+### 7.<font color="#ff0000">Vue3如何实现响应式？</font>
+
+#### Proxy基本使用
+
++ `Reflect`作用（反射）
+  + 和 `Proxy` 能力一一对应
+  + 规范化、标准化、函数式
+  + 替代掉Object上的工具函数
++ proxy-demo: `code/observe-demo/proxy-demo.js`
+
+```javascript
+  const data = {
+    name: 'zhangsan',
+    age: 20
+  }
+  // const data = [a, b, c]
+```
+
+```javascript
+// const proxy = new Proxy(taget, hanlder)
+  const proxyData = new Proxy(data, {
+    get(target, key, receiver) {
+      const result = Reflect.get(taget, key, receiver)
+      console.log('get', key)
+      return result; // 返回结果
+    },
+    set(target, key, value, receiver) {
+      const result = Reflect.set(target, key, value, receiver)
+      console.log('set', key, value)
+      return result // 是否设置成功
+    },
+    deleteProperty(target, key) {
+      const result = Reflect.deleteProperty(target, key)
+      console.log('delete property', key)
+      return result // 是否删除成功
+    }
+  })
+```
+
+#### Vue3用Proxy实现响应式
+
+> code: `code/observe-demo/proxy-observe.js`
 
 ### 8.watch 和 watchEffect 的区别？
 
