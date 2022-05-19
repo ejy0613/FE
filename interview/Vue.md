@@ -940,13 +940,58 @@ JS实现 H5 history 路由： `code/router-demo/history.htm`
 #### Vue3用Proxy实现响应式
 
 > code: `code/observe-demo/proxy-observe.js`
+> 如何实现性能提升的：Vue3 Proxy是在get时，才进行递归（深度监听），不触发就不会调用，Vue2 observe是直接一次性递归
 
-### 8.watch 和 watchEffect 的区别？
++ 深度监听，性能更好
++ 可监听 新增/删除 属性
++ 可监听数组变化
++ Proxy能规避Object.defineProperty的问题
++ Proxy无法兼容所有浏览器，无法polyfill
 
-### 9.setup中如何获取组件实例（实际考this）？
+### 8.v-model参数
 
-### 10.Vue3 为何比 Vue2快？
++ Vue3 移除了 `.sync`，Vue3使用 `v-model:propName`来实现属性双向绑定
 
-### 11.Vite是什么
+```vue
+  <!-- App.vue -->
+  <script setup>
+    import { ref } from 'vue'
+    import ChildComp from './ChildComp.vue'
 
-### 12.Composition API 和 React Hooks对比？
+    const childMsg = ref('No child msg yet')
+  </script>
+
+  <template>
+    <ChildComp v-model:childMsg="childMsg" />
+    <p>{{ childMsg }}</p>
+  </template>
+
+  <!-- ChildComp.vue -->
+  <script setup>
+    const emit = defineEmits(['update:childMsg'])
+
+    emit('update:childMsg', 'hello from child')
+  </script>
+
+  <template>
+    <h2>Child component</h2>
+  </template>
+```
+
+### 9.<font color="#ff0000">watch 和 watchEffect 的区别？</font>
+
++ 两者都可监听 data 属性变化
++ watch需要明确监听哪个属性
++ watchEffect会根据其中的属性，自动监听其变化（初始化时会执行一次，为了收集监听的数据）
+
+### 10.setup中如何获取组件实例（实际考this）？
+
++ 在setup和其他Composition API中没有this
++ 可通过 `getCurrentInstance`获取当前实例
++ 若使用Options API可照常使用this
+
+### 11.Vue3 为何比 Vue2快？
+
+### 12.Vite是什么
+
+### 13.Composition API 和 React Hooks对比？
