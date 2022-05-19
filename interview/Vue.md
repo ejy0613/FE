@@ -992,6 +992,16 @@ JS实现 H5 history 路由： `code/router-demo/history.htm`
 
 ### 11.Vue3 为何比 Vue2快？
 
++ Proxy响应式
++ PatchFlag
+  + 编译模版时，动态节点做标记
+  + 标记，分为不同的类型，如TEXT，PROPS
+  + diff算法时，可以区分静态节点，以及不同类型的动态节点
++ hoistStatic
++ cacheHandler
++ SSR优化
++ tree-shaking
+
 ### 12.Vite是什么
 
 ### 13.Composition API 和 React Hooks对比？
