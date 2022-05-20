@@ -992,16 +992,77 @@ JS实现 H5 history 路由： `code/router-demo/history.htm`
 
 ### 11.Vue3 为何比 Vue2快？
 
+> <https://template-explorer.vuejs.org/>
+
 + Proxy响应式
+
 + PatchFlag
   + 编译模版时，动态节点做标记
-  + 标记，分为不同的类型，如TEXT，PROPS
-  + diff算法时，可以区分静态节点，以及不同类型的动态节点
+  + 标记，分为不同的类型，如 [TEXT，CLASS，PROPS]
+  + diff算法时，可以区分静态节点，以及不同类型的动态节点(vue2没有区分，静态节点也要比较)
+
+  ```javascript
+    export function render(_ctx, _cache, $props, $setup, $data, $options) {
+      return (_openBlock(), _createElementBlock("div", null, [
+        _createElementVNode("span", null, "Hello World"),
+        _createElementVNode("span", null, _toDisplayString(_ctx.msg), 1 /* TEXT */) // patchFlag
+      ]))
+    }
+  ```
+
 + hoistStatic
+  + 将静态节点的定义，提升到父作用域，缓存起来
+  + 多个相邻的静态节点，会被合并起来（要达到一定阈值）
+  + 典型的拿空间换时间的优化策略
+
+  ```javascript
+    const _hoisted_1 = /*#__PURE__*/_createElementVNode("span", null, "Hello World", -1 /* HOISTED */) // 被提升，缓存起来
+    const _hoisted_2 = /*#__PURE__*/_createElementVNode("span", null, "Hello World", -1 /* HOISTED */)
+    const _hoisted_3 = /*#__PURE__*/_createElementVNode("span", null, "Hello World", -1 /* HOISTED */)
+
+    export function render(_ctx, _cache, $props, $setup, $data, $options) {
+      return (_openBlock(), _createElementBlock("div", null, [
+        _hoisted_1,
+        _hoisted_2,
+        _hoisted_3,
+        _createElementVNode("span", null, _toDisplayString(_ctx.msg), 1 /* TEXT */)
+      ]))
+    }
+  ```
+
 + cacheHandler
+  + 缓存事件
+
+  ```javascript
+    export function render(_ctx, _cache, $props, $setup, $data, $options) {
+      return (_openBlock(), _createElementBlock("div", null, [
+        _createElementVNode("span", {
+          onClick: _cache[0] || (_cache[0] = (...args) => (_ctx.handleClick && _ctx.handleClick(...args)))
+        }, "Hello World")
+      ]))
+    }
+  ```
+
 + SSR优化
+  + 静态节点直接输出，绕过了vdom
+  + 动态节点，还是需要动态渲染
+
 + tree-shaking
+  + 编译时，根据不同的情况引入不同的API
 
 ### 12.Vite是什么
 
++ 前端打包工具，Vue作者发起的项目
++ 优势：开发环境下无需打包，启动快
+
+#### Vite为何启动快？
+
++ 开发环境使用ES6 Module，无需打包 -- 非常快
++ 生成环境使用 rollup，并不会快很多
+
 ### 13.Composition API 和 React Hooks对比？
+
++ 前者setup只会调用一次，而后者函数会被多次调用
++ 前者无需使用useMemo useCallback，因为setup只调用一次
++ 前者无需考虑调用顺序，而后者要保证hooks的顺序一致
++ 前者 reactive + ref比后者 useState要难理解

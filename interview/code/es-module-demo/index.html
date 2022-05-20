@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ES6 Module Demo</title>
+</head>
+<body>
+  <p>ES Module Demo</p>
+  <script type="module">
+    import add from './src/add.js';
+    const res = add(10, 20);
+    console.log('add result', res);
+  </script>
+  <script type="module">
+    import { sum, multiply } from './src/math.js'
+    console.log('sum: ', sum(10, 10));
+    console.log('multiply: ', multiply(10, 10));
+  </script>
+</body>
+</html>
